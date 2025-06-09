@@ -37,6 +37,40 @@ def zscore_by_run(mat, run_n=480):
 
 
 def extract_cortical_mask(subj, roi="", output_dir=None):
+    """
+    Extracts a cortical or ROI-specific voxel mask for a given subject, and saves both
+    the full 3D binary mask and (if applicable) a 1D mask within the cortical region.
+
+    Parameters:
+    -----------
+    subj : int
+        Subject number (e.g., 1–8 for NSD dataset).
+    
+    roi : str, optional
+        Region of interest name. If empty, the function extracts a full cortical mask.
+        If "general", the function uses the NSD general cortical mask.
+        Otherwise, it loads the specific ROI mask for the subject.
+    
+    output_dir : str or None, optional
+        Directory where the output .npy mask files will be saved.
+        If None, defaults to `args.output_dir`.
+
+    Returns:
+    --------
+    mask : np.ndarray
+        A 3D boolean array representing the cortical or ROI mask.
+        The mask has the same shape as the anatomical image.
+
+    Notes:
+    ------
+    - When `roi` is provided and non-empty, a corresponding 1D mask is also saved.
+      This 1D mask is flattened over the cortical voxels from the general mask.
+    - The function verifies that the number of cortical voxels matches between
+      the general mask and the ROI-specific 1D vector.
+    - Saved files:
+        - cortical_mask_subjXX[_roi].npy: 3D binary mask
+        - roi_1d_mask_subjXX[_roi].npy: 1D ROI mask within cortical region
+    """
     if output_dir is None:
         output_dir = args.output_dir
     if roi != "":
@@ -86,7 +120,6 @@ def extract_cortical_mask(subj, roi="", output_dir=None):
     )
 
     return mask
-
 
 def extract_voxels(
     subj,
